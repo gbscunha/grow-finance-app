@@ -22,21 +22,29 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // transactions       Transaction[]
+  transactions       Transaction[]
   categories     Category[]
   paymentMethods PaymentMethod[]
 }
 
 model Transaction {
-  id         String          @id @default(uuid())
-  name       String
-  type       TransactionType
-  amount     Decimal         @db.Decimal(10, 2)
+  id        String   @id @default(uuid())
+  name      String
+  type      TransactionType
+  amount    Decimal  @db.Decimal(10, 2)
+  date      DateTime
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
   categoryId String?
-  category   Category?       @relation(fields: [categoryId], references: [id])
-  date       DateTime
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  paymentMethodId String?
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Category {
@@ -48,19 +56,18 @@ model Category {
   transactions Transaction[]
 }
 
+model PaymentMethod {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  transactions Transaction[]
+}
+
 // Enums
 enum TransactionType {
   DEPOSIT
   EXPENSE
   INVESTMENT
-}
-
-enum PaymentMethod {
-  CREDIT_CARD
-  DEBIT_CARD
-  BANK_TRANSFER
-  BANK_SLIP
-  CASH
-  PIX
-  OTHER
 }
